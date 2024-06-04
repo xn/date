@@ -43,6 +43,9 @@ class TestDateNew < Test::Unit::TestCase
     assert_equal(false, Date.valid_commercial?(o, 1, 1))
     assert_equal(false, Date.valid_commercial?(1, o, 1))
     assert_equal(false, Date.valid_commercial?(1, 1, o))
+    assert_equal(false, Date.valid_broadcast?(o, 1, 1))
+    assert_equal(false, Date.valid_broadcast?(1, o, 1))
+    assert_equal(false, Date.valid_broadcast?(1, 1, o))
   end
 
   def test_invalid_types
@@ -58,6 +61,9 @@ class TestDateNew < Test::Unit::TestCase
     assert_raise(TypeError) { Date.commercial(o) }
     assert_raise(TypeError) { Date.commercial(1, o) }
     assert_raise(TypeError) { Date.commercial(1, 1, o) }
+    assert_raise(TypeError) { Date.broadcast(o) }
+    assert_raise(TypeError) { Date.broadcast(1, o) }
+    assert_raise(TypeError) { Date.broadcast(1, 1, o) }
 
     assert_raise(TypeError) { DateTime.jd(o) }
     assert_raise(TypeError) { DateTime.jd(1, o) }
@@ -80,6 +86,12 @@ class TestDateNew < Test::Unit::TestCase
     assert_raise(TypeError) { DateTime.commercial(1, 1, 1, o) }
     assert_raise(TypeError) { DateTime.commercial(1, 1, 1, 1, o) }
     assert_raise(TypeError) { DateTime.commercial(1, 1, 1, 1, 1, o) }
+    assert_raise(TypeError) { DateTime.broadcast(o) }
+    assert_raise(TypeError) { DateTime.broadcast(1, o) }
+    assert_raise(TypeError) { DateTime.broadcast(1, 1, o) }
+    assert_raise(TypeError) { DateTime.broadcast(1, 1, 1, o) }
+    assert_raise(TypeError) { DateTime.broadcast(1, 1, 1, 1, o) }
+    assert_raise(TypeError) { DateTime.broadcast(1, 1, 1, 1, 1, o) }
   end
 
   def test_ordinal
@@ -238,6 +250,32 @@ class TestDateNew < Test::Unit::TestCase
 		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
   end
 
+  def test_broadcast
+    d = Date.broadcast
+    dt = DateTime.broadcast
+    assert_equal([-4712, 1, 1], [d.year, d.mon, d.mday])
+    assert_equal([-4712, 1, 1], [dt.year, dt.mon, dt.mday])
+    assert_equal([0, 0, 0], [dt.hour, dt.min, dt.sec])
+
+    d2 = Date.broadcast
+    dt2 = DateTime.broadcast
+    assert_equal(d, d2)
+    assert_equal(dt, dt2)
+
+    d = Date.broadcast(1582,40,5)
+    assert_equal([1582, 10, 15], [d.year, d.mon, d.mday])
+
+    d = Date.broadcast(1582,40,5.0)
+    assert_equal([1582, 10, 15], [d.year, d.mon, d.mday])
+
+    d = DateTime.broadcast(1582,40,5, 0,0,0, 0)
+    assert_equal([1582, 10, 15, 0, 0, 0, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(1582,40,5, 0,0,0, '+0900')
+    assert_equal([1582, 10, 15, 0, 0, 0, 9.to_r/24],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+  end
+
   def test_commercial__neg
     d = Date.commercial(1998,-1,-1)
     assert_equal([1999, 1, 3], [d.year, d.mon, d.mday])
@@ -247,12 +285,30 @@ class TestDateNew < Test::Unit::TestCase
 		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
   end
 
+  def test_broadcast__neg
+    d = Date.broadcast(1998,-1,-1)
+    assert_equal([1998, 12, 27], [d.year, d.mon, d.mday])
+
+    d = DateTime.broadcast(1998,-1,-1, -1,-1,-1, 0)
+    assert_equal([1998, 12, 27, 23, 59, 59, 0.0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+  end
+
   def test_commercial__ex
     assert_raise(Date::Error) do
       Date.commercial(1997,53,1)
     end
     assert_raise(Date::Error) do
       DateTime.commercial(1997,52,1, 23,59,60, 0)
+    end
+  end
+
+  def test_broadcast__ex
+    assert_raise(Date::Error) do
+      Date.broadcast(1997,53,1)
+    end
+    assert_raise(Date::Error) do
+      DateTime.broadcast(1997,52,1, 23,59,60, 0)
     end
   end
 

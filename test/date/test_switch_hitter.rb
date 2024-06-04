@@ -181,6 +181,49 @@ class TestSH < Test::Unit::TestCase
 		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
   end
 
+  def test_broadcast
+    d = Date.broadcast
+    assert_equal([-4712, 1, 1], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(-4712, 1, 1)
+    assert_equal([-4712, 1, 1], [d.bwyear, d.bweek, d.bwday])
+
+    d = Date.broadcast(2001, 2, 3)
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(2001, 2, 3, Date::JULIAN)
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(2001, 2, 3, Date::GREGORIAN)
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+
+    d = Date.broadcast(2001, -2, -3)
+    assert_equal([2001, 51, 5], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(2001, -2, -3, Date::JULIAN)
+    assert_equal([2001, 52, 5], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(2001, -2, -3, Date::GREGORIAN)
+    assert_equal([2001, 51, 5], [d.bwyear, d.bweek, d.bwday])
+
+    d = DateTime.broadcast
+    assert_equal([-4712, 1, 1, 0, 0, 0, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(-4712, 1, 1)
+    assert_equal([-4712, 1, 1, 0, 0, 0, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001, 5, 6)
+    assert_equal([2001, 2, 3, 0, 0, 0, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001, 5, 6, 4, 5, 6)
+    assert_equal([2001, 2, 3, 4, 5, 6, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001, 5, 6, 4, 5, 6, 0)
+    assert_equal([2001, 2, 3, 4, 5, 6, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001, 5, 6, 4, 5, 6, '+9:00')
+    assert_equal([2001, 2, 3, 4, 5, 6, Rational(9, 24)],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001, 5, 6, -4, -5, -6, '-9:00')
+    assert_equal([2001, 2, 3, 20, 55, 54, Rational(-9, 24)],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+  end
+
   def test_fractional
     d = Date.jd(2451944.0)
     assert_equal(2451944, d.jd)
@@ -209,6 +252,12 @@ class TestSH < Test::Unit::TestCase
     assert_equal([2001, 2, 3], [d.cwyear, d.cweek, d.cwday])
     d = Date.commercial(2001, 2, Rational(3))
     assert_equal([2001, 2, 3], [d.cwyear, d.cweek, d.cwday])
+
+
+    d = Date.broadcast(2001, 2, 3.0)
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+    d = Date.broadcast(2001, 2, Rational(3))
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
 
     d = DateTime.jd(2451944.0)
     assert_equal(2451944, d.jd)
@@ -248,6 +297,11 @@ class TestSH < Test::Unit::TestCase
     d = DateTime.commercial(2001, 2, Rational(3))
     assert_equal([2001, 2, 3], [d.cwyear, d.cweek, d.cwday])
 
+    d = DateTime.broadcast(2001, 2, 3.0)
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+    d = DateTime.broadcast(2001, 2, Rational(3))
+    assert_equal([2001, 2, 3], [d.bwyear, d.bweek, d.bwday])
+
   end
 
   def test_canon24oc
@@ -261,6 +315,9 @@ class TestSH < Test::Unit::TestCase
     assert_equal([2001, 2, 3, 0, 0, 0, 0],
 		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
     d = DateTime.commercial(2001,5,5,24)
+    assert_equal([2001, 2, 3, 0, 0, 0, 0],
+		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
+    d = DateTime.broadcast(2001,5,5,24)
     assert_equal([2001, 2, 3, 0, 0, 0, 0],
 		 [d.year, d.mon, d.mday, d.hour, d.min, d.sec, d.offset])
   end

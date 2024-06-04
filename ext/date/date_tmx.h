@@ -20,6 +20,9 @@ struct tmx_funcs {
     VALUE (*msecs)(void *dat);
     int (*offset)(void *dat);
     char *(*zone)(void *dat);
+    VALUE (*bwyear)(void *dat);
+    int (*bweek)(void *dat);
+    int (*bwday)(void *dat);
 };
 struct tmx {
     void *dat;
@@ -46,6 +49,9 @@ struct tmx {
 #define tmx_msecs tmx_attr(msecs)
 #define tmx_offset tmx_attr(offset)
 #define tmx_zone tmx_attr(zone)
+#define tmx_bwyear tmx_attr(bwyear)
+#define tmx_bweek tmx_attr(bweek)
+#define tmx_bwday tmx_attr(bwday)
 
 #endif
 
